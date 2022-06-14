@@ -1,16 +1,8 @@
-const Twitter = require("twitter")
-const dotenv = require("dotenv")
 const axios = require('axios');
-dotenv.config()
+const client  = require('./client');
+const { tweet } = require("./tweet");
 
 module.exports.quotes = () => {
-
-    const client = new Twitter({
-        consumer_key: process.env.CONSUMER_KEY,
-        consumer_secret: process.env.CONSUMER_SECRET,
-        access_token_key: process.env.ACCESS_TOKEN_KEY,
-        access_token_secret: process.env.ACCESS_TOKEN_SECRET
-    })
 
     axios.get('https://type.fit/api/quotes').then((res) => {
         let englishQuotes = res.data;
@@ -21,13 +13,7 @@ module.exports.quotes = () => {
         }
         // handle when quotes length is more than 280 character
         if (getCharacterLength(englishQuotes[randomNumber].text) < 280) {
-            client.post("statuses/update", { status: `${englishQuotes[randomNumber].text}  \n\n ✍ ${englishQuotes[randomNumber].author} \n\n #quotes #bot` }, function (error, tweet, response) {
-                if (error) {
-                    console.log(error)
-                } else {
-                    console.log(tweet)
-                }
-            })
+            tweet(`${englishQuotes[randomNumber].text}  \n\n ✍ ${englishQuotes[randomNumber].author} \n\n #quotes #bot`);
         }
         else {
             const numberOfTweets = Math.ceil(getCharacterLength(englishQuotes[randomNumber].text) / 280);
